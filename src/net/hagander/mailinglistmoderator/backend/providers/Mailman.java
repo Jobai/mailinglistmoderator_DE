@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 import net.hagander.mailinglistmoderator.backend.ListServer;
 import net.hagander.mailinglistmoderator.backend.MailMessage;
 import net.hagander.mailinglistmoderator.backend.MailMessage.statuslevel;
-import android.util.Log;
 
 /**
  * 
@@ -39,7 +38,7 @@ public class Mailman extends ListServer {
 					Pattern.DOTALL);
 	private static final Pattern authorizationFailedPattern = Pattern
 			.compile(
-					"<strong><font size=\"\\+1\">Authorization\\s+failed.</font></strong>",
+					"<INPUT TYPE=\"password\" NAME=\"adminpw\" SIZE=\"30\">",
 					Pattern.DOTALL);
 
 	/**
