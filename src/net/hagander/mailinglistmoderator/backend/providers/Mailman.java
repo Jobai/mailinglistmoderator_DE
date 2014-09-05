@@ -49,8 +49,8 @@ public class Mailman extends ListServer {
 		Vector<MailMessage> messages = new Vector<MailMessage>();
 
 		// Fetch the details=all page which contains everything we need.
-		String page = FetchUrl(String.format("%s/%s/?details=all&adminpw=%s",
-				rooturl, listname, password));
+		String page = FetchUrl(String.format("%s/?details=all&adminpw=%s",
+				rooturl, password));
 
 		/*
 		 * Check for no such list
@@ -102,8 +102,6 @@ public class Mailman extends ListServer {
 		// The whole moderation operation will go in a single querystring
 		StringBuilder str = new StringBuilder();
 		str.append(rooturl);
-		str.append("/");
-		str.append(listname);
 		str.append("/?");
 
 		// Collect a querystring with all the message ids we are moderating and
