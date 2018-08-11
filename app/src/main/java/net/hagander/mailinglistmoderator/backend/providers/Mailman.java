@@ -7,6 +7,8 @@
  */
 package net.hagander.mailinglistmoderator.backend.providers;
 
+import android.util.Log;
+
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,7 +36,7 @@ public class Mailman extends ListServer {
 					Pattern.DOTALL);
 	private static final Pattern messageContentPattern = Pattern
 			.compile(
-					"<td ALIGN=\"right\"><strong>From:</strong></td>\\s+<td>([^<]+)</td>.*?<td ALIGN=\"right\"><strong>Subject:</strong></td>\\s+<td>([^<]*)</td>.*?<td><TEXTAREA NAME=fulltext-(\\d+) ROWS=10 COLS=76 WRAP=soft READONLY>([^<]*)</TEXTAREA></td>",
+					"<td ALIGN=\"right\"><strong>Absender: </strong></td>\\s+<td>([^<]+)</td>.*?<td ALIGN=\"right\"><strong>Betreff:</strong></td>\\s+<td>([^<]*)</td>.*?<td><TEXTAREA NAME=fulltext-(\\d+) ROWS=10 COLS=76 WRAP=soft READONLY>([^<]*)</TEXTAREA></td>",
 					Pattern.DOTALL);
 	private static final Pattern authorizationFailedPattern = Pattern
 			.compile(
@@ -51,6 +53,8 @@ public class Mailman extends ListServer {
 		// Fetch the details=all page which contains everything we need.
 		String page = FetchUrl(String.format("%s/?details=all&adminpw=%s",
 				rooturl, password));
+
+		//Log.w("PAge", page);
 
 		/*
 		 * Check for no such list
@@ -73,7 +77,9 @@ public class Mailman extends ListServer {
 		Matcher m = enumMailPattern.matcher(page);
 		while (m.find()) {
 			Matcher sm = messageContentPattern.matcher(m.group(1));
+			Log.w("FOUND", "FOUND SOME MAIL");
 			if (sm.find()) {
+				Log.w("FOUND", "FOUND SOME CONTENT");
 				// Got a message
 				// group(1) == from
 				// group(2) == subject
@@ -136,6 +142,7 @@ public class Mailman extends ListServer {
 		 * course, but not if we passed invalid data.
 		 */
 		try {
+			Log.w("REQUEST: ", str.toString());
 			FetchUrl(str.toString());
 		} catch (Exception ex) {
 			callbacks.ShowError(ex.toString());
