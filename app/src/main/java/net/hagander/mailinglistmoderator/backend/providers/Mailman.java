@@ -9,6 +9,9 @@ package net.hagander.mailinglistmoderator.backend.providers;
 
 import android.util.Log;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,166 +21,183 @@ import net.hagander.mailinglistmoderator.backend.MailMessage;
 import net.hagander.mailinglistmoderator.backend.MailMessage.statuslevel;
 
 /**
- * 
  * @author Magnus Hagander <magnus@hagander.net>
- * 
  */
 public class Mailman extends ListServer {
-	public Mailman(String name, String rooturl, String password, String override_certname, String whitelisted_cert) {
-		super(name, rooturl, password, override_certname, whitelisted_cert);
-	}
+    public Mailman(String name, String rooturl, String password, String override_certname, String whitelisted_cert) {
+        super(name, rooturl, password, override_certname, whitelisted_cert);
+    }
 
-	/*
-	 * Regular expressions for matching message lists and contents.
-	 */
-	private static final Pattern enumMailPattern = Pattern
-			.compile(
-					"<table CELLPADDING=\"0\" WIDTH=\"100%\" CELLSPACING=\"0\">(.*?)</table>\\s+<p>",
-					Pattern.DOTALL);
-	private static final Pattern messageContentPattern = Pattern
-			.compile(
-					"<td ALIGN=\"right\"><strong>Absender: </strong></td>\\s+<td>([^<]+)</td>.*?<td ALIGN=\"right\"><strong>Betreff:</strong></td>\\s+<td>([^<]*)</td>.*?<td><TEXTAREA NAME=fulltext-(\\d+) ROWS=10 COLS=76 WRAP=soft READONLY>([^<]*)</TEXTAREA></td>",
-					Pattern.DOTALL);
-	private static final Pattern authorizationFailedPattern = Pattern
-			.compile(
-					"<INPUT TYPE=\"password\" NAME=\"adminpw\" SIZE=\"30\">",
-					Pattern.DOTALL);
+    /*
+     * Regular expressions for matching message lists and contents.
+     */
+    private static final Pattern enumMailPattern = Pattern
+            .compile(
+                    "<table CELLPADDING=\"0\" WIDTH=\"100%\" CELLSPACING=\"0\">(.*?)</table>\\s+<p>",
+                    Pattern.DOTALL);
+    private static final Pattern messageContentPattern = Pattern
+            .compile(
+                    "<td ALIGN=\"right\"><strong>Absender: </strong></td>\\s+<td>([^<]+)</td>.*?<td ALIGN=\"right\"><strong>Betreff:</strong></td>\\s+<td>([^<]*)</td>.*?<td><TEXTAREA NAME=fulltext-(\\d+) ROWS=10 COLS=76 WRAP=soft READONLY>([^<]*)</TEXTAREA></td>",
+                    Pattern.DOTALL);
+    private static final Pattern authorizationFailedPattern = Pattern
+            .compile(
+                    "<INPUT TYPE=\"password\" NAME=\"adminpw\" SIZE=\"30\">",
+                    Pattern.DOTALL);
 
-	/**
-	 * Enumerate all messages on the list, and return them as an Vector.
-	 */
-	@Override
-	protected Vector<MailMessage> EnumerateMessages() {
-		Vector<MailMessage> messages = new Vector<MailMessage>();
+    /**
+     * Enumerate all messages on the list, and return them as an Vector.
+     */
+    @Override
+    protected Vector<MailMessage> EnumerateMessages() {
+        Vector<MailMessage> messages = new Vector<MailMessage>();
 
-		// Fetch the details=all page which contains everything we need.
-		String page = FetchUrl(String.format("%s/?details=all&adminpw=%s",
-				rooturl, password));
+        // Fetch the details=all page which contains everything we need.
+        String page = FetchUrl(String.format("%s/?details=all&adminpw=%s",
+                rooturl, password));
 
-		//Log.w("PAge", page);
+        //Log.w("PAge", page);
 
 		/*
-		 * Check for no such list
+         * Check for no such list
 		 */
-		if (page.contains("<h2>Mailman Administrative Database Error</h2>No such list <em>")) {
-			status = "List does not exist on server";
-			return null;
-		}
-		/*
+        if (page.contains("<h2>Mailman Administrative Database Error</h2>No such list <em>")) {
+            status = "List does not exist on server";
+            return null;
+        }
+        /*
 		 * Check for login failure
 		 */
-		if (authorizationFailedPattern.matcher(page).find()) {
-			status = "Authorization failed - invalid password?";
-			return null;
-		}
+        if (authorizationFailedPattern.matcher(page).find()) {
+            status = "Authorization failed - invalid password?";
+            return null;
+        }
 
 		/*
 		 * Attempt to locate all the messages in the queue.
 		 */
-		Matcher m = enumMailPattern.matcher(page);
-		while (m.find()) {
-			Matcher sm = messageContentPattern.matcher(m.group(1));
-			Log.w("FOUND", "FOUND SOME MAIL");
-			if (sm.find()) {
-				Log.w("FOUND", "FOUND SOME CONTENT");
-				// Got a message
-				// group(1) == from
-				// group(2) == subject
-				// group(3) == id
-				// group(4) == contents
-				messages.add(new MailmanMessage(Integer.parseInt(sm.group(3)),
-						sm.group(1), sm.group(2), sm.group(4)));
-			}
-		}
-		return messages;
-	}
+        Matcher m = enumMailPattern.matcher(page);
+        while (m.find()) {
+            Matcher sm = messageContentPattern.matcher(m.group(1));
+            Log.w("FOUND", "FOUND SOME MAIL");
+            if (sm.find()) {
+                Log.w("FOUND", "FOUND SOME CONTENT");
+                // Got a message
+                // group(1) == from
+                // group(2) == subject
+                // group(3) == id
+                // group(4) == contents
+                messages.add(new MailmanMessage(Integer.parseInt(sm.group(3)),
+                        sm.group(1), sm.group(2), sm.group(4)));
+            }
+        }
+        return messages;
+    }
 
-	/**
-	 * In mailman we moderate a whole batch of messages in a single call.
-	 */
-	@Override
-	public boolean doesIndividualModeration() {
-		return false;
-	}
+    /**
+     * In mailman we moderate a whole batch of messages in a single call.
+     */
+    @Override
+    public boolean doesIndividualModeration() {
+        return false;
+    }
 
-	/**
-	 * Apply any queued moderations to this list.
-	 */
-	@Override
-	public boolean applyChanges(ListServerStatusCallbacks callbacks) {
-		// The whole moderation operation will go in a single querystring
-		StringBuilder str = new StringBuilder();
-		str.append(rooturl);
-		str.append("/?");
+    /**
+     * Apply any queued moderations to this list.
+     */
+    @Override
+    public boolean applyChanges(ListServerStatusCallbacks callbacks) {
+        // The whole moderation operation will go in a single querystring
+        StringBuilder str = new StringBuilder();
+        str.append(rooturl);
+        str.append("/?");
 
-		// Collect a querystring with all the message ids we are moderating and
-		// what to do with them.
-		int count = 0;
-		for (int i = 0; i < messages.size(); i++) {
-			MailmanMessage msg = (MailmanMessage) messages.get(i);
-			if (msg.getStatus() != statuslevel.Defer) {
-				str.append(String.format("%d=%d&", msg.id, msg
-						.getStatusPostCode()));
-				count++;
-			}
-		}
+        // Collect a querystring with all the message ids we are moderating and
+        // what to do with them.
+        int count = 0;
+        for (int i = 0; i < messages.size(); i++) {
+            MailmanMessage msg = (MailmanMessage) messages.get(i);
+            if (msg.getStatus() != statuslevel.Defer) {
+                if(msg.getStatus() != statuslevel.Denied)
+                str.append(String.format("%d=%d&", msg.id, msg
+                        .getStatusPostCode()));
+                if(msg.getStatus() == statuslevel.Defer)
+                {
+                    str.append(String.format("%d=%d&", msg.id, msg
+                            .getStatusPostCode()));
 
-		if (count == 0)
+                    String urlencodedMessage = "Denied because of reasons [fallback message]";
+                    try {
+                        urlencodedMessage = URLEncoder.encode(msg.getDenialReason(), "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    str.append(String.format("comment-%d=%s&", msg.id, urlencodedMessage)); //FIXME Does this work???????
+
+                }
+                count++;
+            }
+        }
+
+        if (count == 0)
 			/*
 			 * Should never happen, but just in case, so we don't construct a
 			 * bad URL
 			 */
-			return false;
+            return false;
 
-		callbacks.SetStatusMessage(String.format("Moderating %d messages...",
-				count));
+        callbacks.SetStatusMessage(String.format("Moderating %d messages...",
+                count));
 
-		// Append our password to the request
-		str.append("adminpw=");
-		str.append(password);
+        // Append our password to the request
+        str.append("adminpw=");
+        str.append(password);
 
 		/*
 		 * Unfortunately mailman doesn't actually tell us if our modifications
 		 * succeeded or not. We'll get an exception if the call failed, of
 		 * course, but not if we passed invalid data.
 		 */
-		try {
-			Log.w("REQUEST: ", str.toString());
-			FetchUrl(str.toString());
-		} catch (Exception ex) {
-			callbacks.ShowError(ex.toString());
-			return false;
-		}
+        try {
+            Log.w("REQUEST: ", str.toString());
+            FetchUrl(str.toString());
+        } catch (Exception ex) {
+            callbacks.ShowError(ex.toString());
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * Implementation of MailMessage holding additional mailman-specific
-	 * properties.
-	 */
-	private class MailmanMessage extends MailMessage {
-		private int id;
+    /**
+     * Implementation of MailMessage holding additional mailman-specific
+     * properties.
+     */
+    private class MailmanMessage extends MailMessage {
+        private int id;
 
-		public MailmanMessage(int id, String sender, String subject,
-				String content) {
-			super(sender, subject, content);
-			this.id = id;
-		}
+        public MailmanMessage(int id, String sender, String subject,
+                              String content) {
+            super(sender, subject, content);
+            this.id = id;
+        }
 
-		/**
-		 * Map the status code to the POST value in a mailman form.
-		 */
-		public int getStatusPostCode() {
-			switch (getStatus()) {
-			case Accept:
-				return 1;
-			case Reject:
-				return 3; // map reject to discard, consider supporting both in
-							// the future
-			}
-			return 0; // default to defer if we're called with something
-						// unexpected.
-		}
-	}
+        /**
+         * Map the status code to the POST value in a mailman form.
+         */
+        public int getStatusPostCode() {
+            switch (getStatus()) {
+                case Defer:
+                    return 0;
+                case Accept:
+                    return 1;
+                case Denied:
+                    return 2;
+                case Reject:
+                    return 3; // map reject to discard, consider supporting both in
+                // the future
+            }
+            return 0; // default to defer if we're called with something
+            // unexpected.
+        }
+    }
 }

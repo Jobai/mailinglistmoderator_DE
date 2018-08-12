@@ -58,5 +58,10 @@ public class MessageViewActivity extends Activity {
 				message.setStatus(statuslevel.Reject);
 				finish();
 			}});
+		((Button) findViewById(R.id.Button_Denied)).setOnClickListener(new OnClickListener(){
+			public void onClick(View v) {
+				message.setStatus(statuslevel.Denied);
+				finish();
+			}});
 	}
 }

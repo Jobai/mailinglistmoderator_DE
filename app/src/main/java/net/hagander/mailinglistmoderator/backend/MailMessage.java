@@ -19,9 +19,10 @@ public abstract class MailMessage {
 	private String subject;
 	private String content;
 	private statuslevel status = statuslevel.Defer;
+    private String denialReason ="Denied because of Reasons!";
 
 	public enum statuslevel {
-		Accept, Reject, Defer
+		Accept, Reject, Defer, Denied
 	};
 
 	public MailMessage(String sender, String subject, String content) {
@@ -58,4 +59,12 @@ public abstract class MailMessage {
 	public statuslevel getStatus() {
 		return status;
 	}
+
+    public void setDenialReason(String denialReason) {
+        this.denialReason = denialReason;
+    }
+
+    public String getDenialReason() {
+        return denialReason;
+    }
 }

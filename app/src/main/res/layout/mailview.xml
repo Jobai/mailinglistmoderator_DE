@@ -45,6 +45,12 @@
                 android:layout_height="wrap_content"
                 android:text="Verwerfen" >
             </Button>
+
+            <Button
+                android:id="@+id/Button_Denied"
+                android:layout_width="139dp"
+                android:layout_height="wrap_content"
+                android:text="Ablehnen (E)" />
         </LinearLayout>
     </LinearLayout>
 
