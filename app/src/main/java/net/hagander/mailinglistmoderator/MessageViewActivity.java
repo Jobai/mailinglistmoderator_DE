@@ -11,6 +11,7 @@ import net.hagander.mailinglistmoderator.backend.MailMessage;
 import net.hagander.mailinglistmoderator.backend.MailMessage.statuslevel;
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -44,7 +45,8 @@ public class MessageViewActivity extends Activity {
 		this.setTitle(message.getSubject());
 
 		setContentView(R.layout.mailview);
-		((TextView) findViewById(R.id.TextView_Body)).setText(message
+        Log.w("Message", message.getContent());
+        ((TextView) findViewById(R.id.TextView_Body)).setText(message
 				.getContent());
 		((TextView) findViewById(R.id.TextView_Sender)).setText(
 				String.format("From: %s\n", message.getSender()));

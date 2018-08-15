@@ -18,39 +18,55 @@
             android:text="" >
         </TextView>
 
-        <TextView
-            android:id="@+id/TextView_Body"
+        <ScrollView
+            android:id="@+id/SCROLLER_ID"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:text="" >
-        </TextView>
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"
+            android:fillViewport="true">
+            <TextView
+                android:id="@+id/TextView_Body"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="" >
+            </TextView>
+        </ScrollView>
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="bottom"
-            android:orientation="horizontal" >
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:layout_gravity="bottom" >
 
             <Button
                 android:id="@+id/Button_Accept"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Akzeptieren" >
+                android:text="Akzeptieren"
+                android:layout_gravity="bottom"
+                android:layout_weight="1">
             </Button>
 
             <Button
                 android:id="@+id/Button_Reject"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Verwerfen" >
+                android:text="Verwerfen"
+                android:layout_gravity="bottom"
+                android:layout_weight="1">
             </Button>
 
             <Button
                 android:id="@+id/Button_Denied"
                 android:layout_width="139dp"
                 android:layout_height="wrap_content"
-                android:text="Ablehnen (E)" />
+                android:text="Ablehnen (E)"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"/>
         </LinearLayout>
     </LinearLayout>
 

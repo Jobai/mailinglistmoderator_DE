@@ -30,12 +30,18 @@ public abstract class MailMessage {
 		 * Create new strings to de-couple from large strings being returned
 		 * in regex matches. We do this here to get it in a centralized location,
 		 * even if it means we might duplicate once or twice too many.
-		 * Also, limit the length of the content to 255 bytes.
+		 * Also, limit the length of the content to 10000 bytes. NEW LIMIT!
 		 */
 		this.sender = new String(sender);
 		this.subject = new String(subject);
-		if (content.length() > 255)
-			this.content = new String(content.substring(0,255));
+        final int messageLimit = 10000;
+        if (content.length() > messageLimit)
+        {
+            String newMessage =new String(content.substring(0, messageLimit));
+            newMessage = newMessage.concat("-------------MESSAGE CUT SHORT AFTER 10000 BYTES!---------------");
+            this.content = newMessage;
+
+        }
 		else
 			this.content = new String(content);
 	}
