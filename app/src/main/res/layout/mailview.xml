@@ -66,6 +66,15 @@
                 android:layout_height="wrap_content"
                 android:text="Ablehnen (E)"
                 android:layout_gravity="bottom"
+                android:layout_weight="1">
+            </Button>
+
+            <Button
+                android:id="@+id/Button_Spam"
+                android:layout_width="139dp"
+                android:layout_height="wrap_content"
+                android:text="SPAM (E)"
+                android:layout_gravity="bottom"
                 android:layout_weight="1"/>
         </LinearLayout>
     </LinearLayout>

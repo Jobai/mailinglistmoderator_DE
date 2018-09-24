@@ -8,6 +8,10 @@
  */
 package net.hagander.mailinglistmoderator.backend;
 
+import net.hagander.mailinglistmoderator.glue.MailMessageAdapter;
+
+import java.util.Vector;
+
 /**
  * 
  * @author Magnus Hagander <magnus@hagander.net>
@@ -20,10 +24,25 @@ public abstract class MailMessage {
 	private String content;
 	private statuslevel status = statuslevel.Defer;
     private String denialReason ="Denied because of Reasons!";
+    private boolean spam = false;
 
 	public enum statuslevel {
 		Accept, Reject, Defer, Denied
 	};
+
+	public boolean checkForSpam(Vector<String> m)
+    {
+        if(!m.isEmpty()) {
+            for (String spamSubject : m) {
+                if (spamSubject.equals(this.subject)) {
+                    spam = true;
+                    status = statuslevel.Reject;
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
 
 	public MailMessage(String sender, String subject, String content) {
 		/* 
@@ -46,6 +65,21 @@ public abstract class MailMessage {
 			this.content = new String(content);
 	}
 
+    public void setSpam(boolean spam) {
+        this.spam = spam;
+        if(spam){
+            this.status = statuslevel.Reject; //XXX
+            MailMessageAdapter.blacklist.add(this.subject);
+        }
+        else{
+            MailMessageAdapter.blacklist.remove(this.subject);
+        }
+
+    }
+
+    public boolean isSpam() {
+        return spam;
+    }
 	public String getSender() {
 		return sender;
 	}
@@ -59,6 +93,7 @@ public abstract class MailMessage {
 	}
 
 	public void setStatus(statuslevel status) {
+        setSpam(false);
 		this.status = status;
 	}
 

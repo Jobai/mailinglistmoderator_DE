@@ -65,5 +65,10 @@ public class MessageViewActivity extends Activity {
 				message.setStatus(statuslevel.Denied);
 				finish();
 			}});
+		((Button) findViewById(R.id.Button_Spam)).setOnClickListener(new OnClickListener(){
+			public void onClick(View v) {
+                message.setSpam(true);
+				finish();
+			}});
 	}
 }

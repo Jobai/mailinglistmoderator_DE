@@ -27,9 +27,11 @@ import android.widget.TextView;
  * @author Magnus Hagander <magnus@hagander.net>
  */
 public class MailMessageAdapter extends ArrayAdapter<MailMessage> {
+
+    public static  Vector<String> blacklist = new Vector<String>();
     private Vector<MailMessage> items;
 
-    private Bitmap img_green = null, img_red = null, img_orange = null;
+    private Bitmap img_green = null, img_red = null, img_orange = null, img_spam = null;
 
     public MailMessageAdapter(Context context, int textViewResourceId,
                               Vector<MailMessage> objects) {
@@ -44,6 +46,8 @@ public class MailMessageAdapter extends ArrayAdapter<MailMessage> {
                     R.drawable.red);
             img_orange = BitmapFactory.decodeResource(context.getResources(),
                     R.drawable.orange);
+            img_spam = BitmapFactory.decodeResource(context.getResources(),
+                    R.drawable.spam);
         } catch (Exception e) {
             Log.w("MailMessageAdapter", String.format(
                     "Exception loading images: %s", e.getMessage()));
@@ -64,6 +68,9 @@ public class MailMessageAdapter extends ArrayAdapter<MailMessage> {
         }
         MailMessage o = items.get(position);
         if (o != null) {
+
+            o.checkForSpam(MailMessageAdapter.blacklist);
+
             TextView sender = (TextView) v.findViewById(R.id.TextView_Sender);
             TextView subj = (TextView) v.findViewById(R.id.TextView_Subject);
             ImageView i = (ImageView) v.findViewById(R.id.ImageViewAction);
@@ -76,7 +83,14 @@ public class MailMessageAdapter extends ArrayAdapter<MailMessage> {
                         i.setImageBitmap(img_green);
                         break;
                     case Reject:
-                        i.setImageBitmap(img_red);
+                        if(o.isSpam())
+                        {
+                            i.setImageBitmap(img_spam);
+                        }
+                        else
+                        {
+                            i.setImageBitmap(img_red);
+                        }
                         break;
                     case Denied:
                         i.setImageBitmap(img_orange); //FIXME change to different icon
