@@ -110,4 +110,4 @@ majordomo2 case take a while if it's a lot of emails to be moderated.
 Common issues
 -------------
 
-* The mailinglist software to be in English - localized versions don't work.
+* The mailinglist software to be in GERMAN - localized versions don't work.
