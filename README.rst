@@ -1,23 +1,17 @@
 Mailinglist Moderator
 =====================
 
-This is just a small program to make moderating mailinglists while on the road
-a bit easier. If you're like me and don't like them to clutter up your mailbox,
-at least.
+Dies ist nur ein kleines Programm, um das Moderieren von Mailinglisten von unterwegs aus ein wenig zu erleichtern. 
 
-The program will simply enumerate all pending moderation requests and let you
-approve or reject them.
+Das Programm zeigt alle ausstehenden Moderationsanfragen an und ermöglichen es diese zu genehmigen, abzulehnen, zu verwerfen* oder als Spam (Listenübergreifend)* zu markieren. Bei einer Ablehnung kann zudem eine Ablehnungsnachricht spezifiziert werden.*
 
-At this point, only posts are moderated, not subscription requests.
+Zu diesem Zeitpunkt können nur Beiträge moderiert werden und keine Anmeldungen für eine Mailingliste.
 
-Installing
-----------
-Note! You are advised to install the program from the Android Market where
-it's available for free. There are some APKs available for download from
-the github page, but all updates are not always published there. The source
-always is, of course, just not the prebuilt APKs.
+(* Neu in dieser Weiterentwicklung)
 
-Setting up a list
+
+
+Einrichten einer Liste
 -----------------
 To add a new mailinglist, hit the *Menu* key and select *Servers...*. Hit
 *Menu* again, and select *New server*. In the window that shows up, enter the
@@ -47,9 +41,7 @@ Mailman
 +++++++
 For mailman, the base url is typically ``http://lists.domain.com/mailman/admindb``.
 
-Majordomo2
-++++++++++
-For majordomo2, the base url is typically ``http://lists.domain.com/mj/mj_wwwadm``.
+
 
 Importing and exporting
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -95,17 +87,14 @@ To moderate the entries on a list, just click the list from the main view. This
 will give a list of all the emails pending on this list, the sender of them
 and the subject. To view the contents of the mail, just click the mail.
 
-To moderate an individual email, click-hold on it and choose to reject or approve
-it. You can also hit the *Menu* key and from the popup menu choose to reject
+To moderate an individual email, click-hold on it and choose to reject, approve, defer it* or to mark it as spam*.
+You can also hit the *Menu* key and from the popup menu choose to reject
 or approve all messages at once.
 
 Once you're satisfied with the status of the messages, hit the *Menu* key and
 select *Apply moderation*. This will call out to the server and make the actual
 moderation changes.
 
-Depending on mailinglist manager this will be a single operation (for mailman)
-or a sequence of one operation for each message (majordomo2), and may in the
-majordomo2 case take a while if it's a lot of emails to be moderated.
 
 Common issues
 -------------
